@@ -1,19 +1,35 @@
-import * as React from "react";
+import { useRef } from "react";
+import type { Project } from "../types";
 
-export function useTheme() {
-    const [theme, setTheme] = React.useState<"light" | "dark">(() => {
-        if (typeof window === "undefined") return "light";
-        const saved = window.localStorage.getItem("theme");
-        if (saved === "light" || saved === "dark") return saved;
-        return window.matchMedia?.("(prefers-color-scheme: dark)")?.matches ? "dark" : "light";
-    });
+export function useProjectIO(opts: {
+    setProject: (p: Project) => void;
+    setSelectedDeviceId: (id: string | null) => void;
+}) {
+    const importRef = useRef<HTMLInputElement | null>(null);
 
-    React.useEffect(() => {
-        const root = document.documentElement;
-        if (theme === "dark") root.classList.add("dark");
-        else root.classList.remove("dark");
-        window.localStorage.setItem("theme", theme);
-    }, [theme]);
+    const normalizeImported = (raw: any): Project | null => {
+        if (!raw || !Array.isArray(raw.devices) || !Array.isArray(raw.nets) || !Array.isArray(raw.connections)) return null;
+        const placements = Array.isArray(raw.placements) ? raw.placements : [];
+        const devIds = new Set(raw.devices.map((d: any) => d.id));
+        const cleanedPlacements = placements
+            .filter((pl: any) => pl && typeof pl.deviceId === "string" && devIds.has(pl.deviceId))
+            .map((pl: any) => ({ deviceId: pl.deviceId, x: Number(pl.x) || 0, y: Number(pl.y) || 0 }));
+        return { ...raw, placements: cleanedPlacements };
+    };
 
-    return { theme, setTheme };
+    const onImportClick = () => importRef.current?.click();
+
+    const onImportFile = async (file: File) => {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        const norm = normalizeImported(parsed);
+        if (!norm) {
+            alert("Invalid project file");
+            return;
+        }
+        opts.setProject(norm);
+        opts.setSelectedDeviceId(norm.devices?.[0]?.id ?? null);
+    };
+
+    return { importRef, onImportClick, onImportFile };
 }
