@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { DeviceType } from "../types";
+import { SchematicNode } from "./SchematicNode";
 import { PALETTE } from "../palette";
 
 export function PalettePanel(props: {
@@ -23,11 +24,22 @@ export function PalettePanel(props: {
                             key={p.type}
                             draggable
                             onDragStart={(e) => onPaletteDragStart(e, p.type)}
-                            className="rounded-xl border bg-background p-2 text-left hover:bg-muted/40"
+                            className="rounded-xl"
                             title="Drag onto schematic"
                         >
-                            <div className="text-sm font-semibold">{p.label}</div>
-                            <div className="text-xs text-muted-foreground">{p.hint}</div>
+                            <div style={{ width: 160, height: 90 }}>
+                                <SchematicNode
+                                    device={{
+                                        name: p.label,
+                                        type: p.type,
+                                        subsystem: undefined,
+                                        attrs: {},
+                                    }}
+                                    selected={false}
+                                    showDragBadge={false} // palette doesn't need it
+                                />
+                            </div>
+                            <div className="mt-1 text-xs text-muted-foreground">{p.hint}</div>
                         </div>
                     ))}
                 </div>

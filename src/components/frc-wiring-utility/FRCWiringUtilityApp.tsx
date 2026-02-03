@@ -118,6 +118,8 @@ export default function FRCWiringUtilityApp() {
         addDeviceAt(type, snap(1200 / 2 - NODE_W / 2, GRID), snap(800 / 2 - NODE_H / 2, GRID));
     };
 
+    const centerFnRef = React.useRef<null | (() => void)>(null);
+
     return (
         <div className="min-h-screen w-full bg-background">
             <TopBar
@@ -131,6 +133,7 @@ export default function FRCWiringUtilityApp() {
                 errorsCount={errorsCount}
                 warnsCount={warnsCount}
                 theme={theme}
+                onCenterView={() => centerFnRef.current?.()}
                 toggleTheme={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
             />
 
@@ -157,6 +160,9 @@ export default function FRCWiringUtilityApp() {
                             NODE_H={NODE_H}
                             onDropCreate={addDeviceAt}
                             onMovePlacement={movePlacement}
+                            registerCenterFn={(fn) => {
+                                centerFnRef.current = fn;
+                            }}
                         />
                     </CardContent>
                 </Card>

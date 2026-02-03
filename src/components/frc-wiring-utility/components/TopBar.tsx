@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Download, Upload, Moon, Sun } from "lucide-react";
+import { Download, Upload, Moon, Sun, Crosshair } from "lucide-react";
 import type { Project } from "../types";
 import { safeInt } from "../helpers";
 
@@ -20,6 +20,9 @@ export function TopBar(props: {
     warnsCount: number;
     theme: "light" | "dark";
     toggleTheme: () => void;
+
+    // NEW
+    onCenterView: () => void;
 }) {
     const {
         project,
@@ -33,7 +36,7 @@ export function TopBar(props: {
         warnsCount,
         theme,
         toggleTheme,
-    } = props;
+        onCenterView } = props;
 
     return (
         <header className="sticky top-0 z-20 border-b bg-background/80 backdrop-blur">
@@ -104,6 +107,12 @@ export function TopBar(props: {
                         <Download className="mr-2 h-4 w-4" />
                         Export
                     </Button>
+
+                    <Button variant="secondary" className="h-8" onClick={onCenterView} title="Center/fit (Space)">
+                        <Crosshair className="mr-2 h-4 w-4" />
+                        Center
+                    </Button>
+
 
                     <div className="ml-1 flex items-center gap-2">
                         <Badge variant={errorsCount ? "destructive" : "secondary"}>{errorsCount} errors</Badge>
